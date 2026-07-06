@@ -1,0 +1,191 @@
+<!DOCTYPE html>
+<html lang="en" class="bg-background">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>CyberWeb — Analysis Report</title>
+  <meta name="description" content="Detailed threat analysis report with scan, cyber intel and sandbox results." />
+  <meta name="theme-color" content="#0a0b0a" />
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=Anton&family=Space+Grotesk:wght@400;500;600;700&display=swap" rel="stylesheet" />
+  <link rel="stylesheet" href="css/style.css" />
+</head>
+<body data-page="report">
+  <div class="app">
+    <aside class="ribbon" id="ribbon"></aside>
+    <div class="main">
+      <div class="appbar">
+        <h1>Analysis Report</h1>
+        <div class="actions">
+          <button class="icon-btn" onclick="toggleTheme()" title="Toggle theme" data-icon="theme"></button>
+          <button class="btn btn-sm" id="flag-btn" onclick="flagIt()"><span data-icon="flag" style="width:16px;height:16px;display:inline-flex"></span> Flag</button>
+          <button class="btn btn-primary btn-sm" onclick="window.print()"><span data-icon="download" style="width:16px;height:16px;display:inline-flex"></span> Generate PDF</button>
+        </div>
+      </div>
+
+      <div class="page-body">
+        <!-- URL details + verdict -->
+        <div class="panel mb-6">
+          <div class="panel-head">
+            <div>
+              <p class="eyebrow accent" style="margin-bottom:6px">URL Details</p>
+              <h3 id="r-host" style="word-break:break-all">—</h3>
+            </div>
+            <span class="badge" id="r-verdict" style="font-size:0.9rem;padding:8px 16px">—</span>
+          </div>
+          <div style="padding:22px" class="grid grid-4">
+            <div><div class="k" style="font-size:0.7rem;letter-spacing:0.14em;text-transform:uppercase;color:var(--muted)">Full URL</div><div id="r-url" style="word-break:break-all">—</div></div>
+            <div><div class="k" style="font-size:0.7rem;letter-spacing:0.14em;text-transform:uppercase;color:var(--muted)">Scanned</div><div id="r-time">—</div></div>
+            <div><div class="k" style="font-size:0.7rem;letter-spacing:0.14em;text-transform:uppercase;color:var(--muted)">Risk Score</div><div id="r-risk">—</div></div>
+            <div><div class="k" style="font-size:0.7rem;letter-spacing:0.14em;text-transform:uppercase;color:var(--muted)">Threats Found</div><div id="r-threatcount">—</div></div>
+          </div>
+        </div>
+
+        <!-- Tabs -->
+        <div class="tabs">
+          <button class="tab active" onclick="showTab('scan', this)">Scan</button>
+          <button class="tab" onclick="showTab('intel', this)">Cyber Intel</button>
+          <button class="tab" onclick="showTab('sandbox', this)">Sandbox</button>
+        </div>
+
+        <!-- Scan tab -->
+        <div class="tab-panel active" id="tab-scan">
+          <div class="gauge-wrap mb-6">
+            <div class="gauge">
+              <h4>Legitimacy Score</h4>
+              <div class="ring" id="gauge-legit"></div>
+              <p class="muted" id="legit-label">—</p>
+            </div>
+            <div class="gauge">
+              <h4>AI Model Confidence</h4>
+              <div class="ring" id="gauge-ai"></div>
+              <p class="muted">Verdict certainty</p>
+            </div>
+          </div>
+          <div class="panel">
+            <div class="panel-head"><h3>Detected Threats</h3></div>
+            <div id="threat-list"></div>
+          </div>
+        </div>
+
+        <!-- Intel tab -->
+        <div class="tab-panel" id="tab-intel">
+          <div class="grid grid-2">
+            <div class="panel"><div class="panel-head"><h3>Domain Intel</h3></div><div id="intel-list"></div></div>
+            <div class="panel"><div class="panel-head"><h3>Reputation</h3></div><div id="rep-list"></div></div>
+          </div>
+        </div>
+
+        <!-- Sandbox tab -->
+        <div class="tab-panel" id="tab-sandbox">
+          <div class="grid grid-4 mb-6" id="sandbox-stats"></div>
+          <div class="panel"><div class="panel-head"><h3>Behaviour Summary</h3></div><div id="sandbox-notes" style="padding:22px"></div></div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <script src="js/common.js"></script>
+  <script src="js/mock.js"></script>
+  <script>
+    // load report or synthesize a demo one
+    let report = loadLastReport();
+    if (!report) report = generateReport("secure-login-paypa1.com/verify");
+
+    const verdictBadge = { SAFE: "badge-ok", SUSPICIOUS: "badge-warn", MALICIOUS: "badge-danger" };
+    const verdictColorVar = { SAFE: "--ok", SUSPICIOUS: "--warn", MALICIOUS: "--danger" };
+
+    // header
+    document.getElementById("r-host").textContent = report.host;
+    document.getElementById("r-url").textContent = report.url;
+    document.getElementById("r-time").textContent = report.scannedAt;
+    document.getElementById("r-risk").textContent = report.riskScore + "/100";
+    document.getElementById("r-threatcount").textContent = report.detected.length;
+    const vb = document.getElementById("r-verdict");
+    vb.textContent = report.verdict;
+    vb.classList.add(verdictBadge[report.verdict]);
+
+    // ---- gauges ----
+    function drawGauge(elId, value, max, colorVar) {
+      const el = document.getElementById(elId);
+      const pct = value / max;
+      const R = 62, C = 2 * Math.PI * R;
+      const color = getComputedStyle(document.documentElement).getPropertyValue(colorVar).trim();
+      el.innerHTML = `
+        <svg viewBox="0 0 150 150">
+          <circle cx="75" cy="75" r="${R}" stroke="var(--border)" stroke-width="12" fill="none"/>
+          <circle cx="75" cy="75" r="${R}" stroke="${color}" stroke-width="12" fill="none"
+            stroke-linecap="round" stroke-dasharray="${C}" stroke-dashoffset="${C}" id="${elId}-arc"/>
+        </svg>
+        <div class="val">${max === 100 ? value + "%" : value.toFixed(1) + "%"}</div>`;
+      // animate
+      requestAnimationFrame(() => {
+        const arc = document.getElementById(elId + "-arc");
+        arc.style.transition = "stroke-dashoffset 1s ease";
+        arc.style.strokeDashoffset = C * (1 - pct);
+      });
+    }
+
+    const legitColor = report.legitimacy >= 70 ? "--ok" : report.legitimacy >= 45 ? "--warn" : "--danger";
+    drawGauge("gauge-legit", report.legitimacy, 100, legitColor);
+    drawGauge("gauge-ai", report.aiConfidence, 100, "--accent");
+    document.getElementById("legit-label").textContent =
+      report.legitimacy >= 70 ? "Looks legitimate" : report.legitimacy >= 45 ? "Proceed with caution" : "Likely malicious";
+
+    // threats
+    document.getElementById("threat-list").innerHTML = report.detected.length
+      ? report.detected
+          .map((t) => `<div class="alert-row"><span class="dot dot-danger"></span><span class="url">${t}</span><span class="time">detected</span></div>`)
+          .join("")
+      : '<div class="alert-row"><span class="dot dot-ok"></span><span class="url">No threats detected</span></div>';
+
+    // intel
+    const i = report.intel;
+    document.getElementById("intel-list").innerHTML = `
+      ${row("Registrar", i.registrar)}
+      ${row("Domain age", i.created)}
+      ${row("Hosting country", i.country)}
+      ${row("SSL certificate", i.ssl)}
+      ${row("IP address", i.ip)}
+      ${row("ASN", i.asn)}`;
+    document.getElementById("rep-list").innerHTML = `
+      ${row("Reputation", i.reputation)}
+      ${row("Blacklist hits", i.blacklists)}
+      ${row("Verdict", report.verdict)}
+      ${row("Risk score", report.riskScore + "/100")}`;
+
+    function row(k, v) {
+      return `<div class="alert-row"><span class="muted">${k}</span><span class="time" style="color:var(--text)">${v}</span></div>`;
+    }
+
+    // sandbox
+    const s = report.sandbox;
+    const stats = [
+      ["Network Requests", s.requests], ["Cookies Set", s.cookies],
+      ["Redirects", s.redirects], ["File Downloads", s.downloads],
+    ];
+    document.getElementById("sandbox-stats").innerHTML = stats
+      .map(([k, v]) => `<div class="stat-card"><span class="k">${k}</span><div class="v">${v}</div></div>`)
+      .join("");
+    document.getElementById("sandbox-notes").innerHTML = `
+      ${row("Obfuscated JavaScript", s.obfuscatedJs)}
+      ${row("Credential forms", s.forms)}
+      ${row("Sandbox verdict", s.verdict)}`;
+
+    // tabs
+    function showTab(id, btn) {
+      document.querySelectorAll(".tab").forEach((t) => t.classList.remove("active"));
+      document.querySelectorAll(".tab-panel").forEach((p) => p.classList.remove("active"));
+      btn.classList.add("active");
+      document.getElementById("tab-" + id).classList.add("active");
+    }
+
+    function flagIt() {
+      const btn = document.getElementById("flag-btn");
+      btn.textContent = "✓ Flagged";
+      btn.classList.add("btn-primary");
+    }
+  </script>
+</body>
+</html>

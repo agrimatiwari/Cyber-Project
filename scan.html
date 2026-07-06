@@ -1,0 +1,93 @@
+<!DOCTYPE html>
+<html lang="en" class="bg-background">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>CyberWeb — New Scan</title>
+  <meta name="description" content="Submit a URL, screenshot or file for threat analysis." />
+  <meta name="theme-color" content="#0a0b0a" />
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=Anton&family=Space+Grotesk:wght@400;500;600;700&display=swap" rel="stylesheet" />
+  <link rel="stylesheet" href="css/style.css" />
+</head>
+<body data-page="scan">
+  <div class="app">
+    <aside class="ribbon" id="ribbon"></aside>
+    <div class="main">
+      <div class="appbar">
+        <h1>New Scan</h1>
+        <div class="actions">
+          <button class="icon-btn" onclick="toggleTheme()" title="Toggle theme" data-icon="theme"></button>
+          <a href="dashboard.html" class="btn btn-sm">Dashboard</a>
+        </div>
+      </div>
+
+      <div class="page-body">
+        <div class="scanbox">
+          <p class="eyebrow accent">Analyse a target</p>
+          <h2>Found something suspicious? <br /> Let us check it for you.</h2>
+          <p class="muted mb-6">Paste a link or upload evidence. We&apos;ll run scanning, threat intel and an AI verdict.</p>
+
+          <form onsubmit="return startScan(event)">
+            <div class="field">
+              <label>Paste URL</label>
+              <input class="input" id="url-input" type="text" placeholder="https://suspicious-site.example/login" />
+            </div>
+
+            <div class="field">
+              <label>Upload screenshot</label>
+              <label class="file-drop">
+                <span data-icon="upload"></span>
+                <span id="ss-name">Drop a screenshot or click to browse</span>
+                <input type="file" accept="image/*" style="display:none" onchange="document.getElementById('ss-name').textContent = this.files[0]?.name || 'Drop a screenshot or click to browse'" />
+              </label>
+            </div>
+
+            <div class="field">
+              <label>Upload file</label>
+              <label class="file-drop">
+                <span data-icon="upload"></span>
+                <span id="file-name">Drop a file or click to browse</span>
+                <input type="file" style="display:none" onchange="document.getElementById('file-name').textContent = this.files[0]?.name || 'Drop a file or click to browse'" />
+              </label>
+            </div>
+
+            <label class="field" style="display:block">
+              <span style="display:block;font-size:0.75rem;letter-spacing:0.16em;text-transform:uppercase;color:var(--muted);margin-bottom:8px">Analysis options</span>
+            </label>
+            <div class="check-row" id="checks">
+              <label class="check active"><input type="checkbox" checked /> Mail extension check</label>
+              <label class="check active"><input type="checkbox" checked /> Deep scan</label>
+              <label class="check active"><input type="checkbox" checked /> Sandbox detonation</label>
+              <label class="check"><input type="checkbox" /> Screenshot OCR</label>
+            </div>
+
+            <button class="btn btn-primary btn-block mt-4" type="submit">Analyze</button>
+          </form>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <script src="js/common.js"></script>
+  <script src="js/mock.js"></script>
+  <script>
+    // toggle check active state
+    document.getElementById("checks").addEventListener("change", (e) => {
+      const label = e.target.closest(".check");
+      if (label) label.classList.toggle("active", e.target.checked);
+    });
+
+    function startScan(e) {
+      e.preventDefault();
+      let url = document.getElementById("url-input").value.trim();
+      if (!url) url = "secure-login-paypa1.com/verify"; // demo fallback
+      const report = generateReport(url);
+      saveLastReport(report);
+      window.location.href = "loading.html";
+      return false;
+    }
+  </script>
+</body>
+</html>

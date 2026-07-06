@@ -1,0 +1,52 @@
+<!DOCTYPE html>
+<html lang="en" class="bg-background">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>SpiderWeb — Analysing…</title>
+  <meta name="description" content="Analysing your submission." />
+  <meta name="theme-color" content="#0a0b0a" />
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=Anton&family=Space+Grotesk:wght@400;500;600;700&display=swap" rel="stylesheet" />
+  <link rel="stylesheet" href="css/style.css" />
+</head>
+<body data-page="loading">
+ <div class="loading-wrap">
+    <canvas id="web-canvas"></canvas>
+
+    <div class="loading-progress-track">
+    <div class="loading-progress-fill" id="progress"></div>
+</div>
+
+  <script src="js/common.js"></script>
+  <script src="js/mock.js"></script>
+  <script src="js/spiderweb.js"></script>
+  <script>
+    initSpiderWeb(document.getElementById("web-canvas"));
+
+    const progress = document.getElementById("progress");
+let pct = 0;
+
+const timer = setInterval(() => {
+
+    pct += Math.random() * 12 + 6;
+
+    if (pct > 100)
+        pct = 100;
+
+    progress.style.width = pct + "%";
+
+    if (pct >= 100) {
+        clearInterval(timer);
+
+        setTimeout(() => {
+            window.location.href = "report.html";
+        }, 500);
+    }
+
+}, 550);
+
+  </script>
+</body>
+</html>

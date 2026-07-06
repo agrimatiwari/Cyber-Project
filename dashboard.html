@@ -1,0 +1,135 @@
+<!DOCTYPE html>
+<html lang="en" class="bg-background">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>CyberWeb — Dashboard</title>
+  <meta name="description" content="Threats, risk score, flagged sites and live alerts." />
+  <meta name="theme-color" content="#0a0b0a" />
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=Anton&family=Space+Grotesk:wght@400;500;600;700&display=swap" rel="stylesheet" />
+  <link rel="stylesheet" href="css/style.css" />
+</head>
+<body data-page="dashboard">
+  <div class="app">
+    <aside class="ribbon" id="ribbon"></aside>
+    <div class="main">
+      <div class="appbar">
+        <h1>Dashboard</h1>
+        <div class="actions">
+          <button class="icon-btn" onclick="toggleTheme()" title="Toggle theme" data-icon="theme"></button>
+          <a href="scan.html" class="btn btn-primary btn-sm"><span data-icon="plus" style="width:16px;height:16px;display:inline-flex"></span> New Scan</a>
+        </div>
+      </div>
+
+      <div class="page-body">
+        <!-- stat row -->
+        <div class="grid grid-4 mb-6">
+          <div class="stat-card">
+            <div class="top"><span class="k">Threats Detected</span><span class="badge badge-danger" id="threat-trend">▲ 12%</span></div>
+            <div class="v" id="stat-threats">—</div>
+          </div>
+          <div class="stat-card">
+            <div class="top"><span class="k">Risk Score</span><span class="badge badge-warn">Medium</span></div>
+            <div class="v"><span id="stat-risk">—</span><span style="font-size:1.2rem;color:var(--muted)">/100</span></div>
+          </div>
+          <div class="stat-card">
+            <div class="top"><span class="k">Flagged Websites</span><span class="badge badge-danger">Active</span></div>
+            <div class="v" id="stat-flagged">—</div>
+          </div>
+          <div class="stat-card">
+            <div class="top"><span class="k">Total Scans</span><span class="badge badge-ok">▲ Live</span></div>
+            <div class="v" id="stat-scans">—</div>
+          </div>
+        </div>
+
+        <div class="grid grid-2 mb-6">
+          <!-- flagged websites -->
+          <div class="panel" id="flagged">
+            <div class="panel-head"><h3>Flagged Websites</h3><a href="report.html" class="pill-tag">View more</a></div>
+            <div id="flagged-list"></div>
+          </div>
+
+          <!-- risk breakdown -->
+          <div class="panel" id="threat">
+            <div class="panel-head"><h3>Threat Breakdown</h3><span class="pill-tag">Last 24h</span></div>
+            <div style="padding:22px" id="breakdown"></div>
+          </div>
+        </div>
+
+        <!-- live alerts -->
+        <div class="panel" id="logs">
+          <div class="panel-head"><h3>History / Live Alerts</h3><span class="pill-tag" id="live-tag">● Live</span></div>
+          <div id="alert-list"></div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <script src="js/common.js"></script>
+  <script src="js/mock.js"></script>
+  <script>
+    const data = generateDashboard();
+
+    document.getElementById("stat-threats").textContent = data.threats;
+    document.getElementById("stat-risk").textContent = data.riskScore;
+    document.getElementById("stat-flagged").textContent = data.flagged;
+    document.getElementById("stat-scans").textContent = data.scans;
+
+    // flagged list
+    document.getElementById("flagged-list").innerHTML = data.flaggedList
+      .map(
+        (f) => `
+      <div class="alert-row">
+        <span class="dot dot-danger"></span>
+        <span class="url">${f.host}</span>
+        <span class="pill-tag">${f.type}</span>
+        <span class="time">risk ${f.risk}</span>
+      </div>`
+      )
+      .join("");
+
+    // breakdown bars
+    const types = {};
+    data.alerts.forEach((a) => { if (a.type !== "Clean scan") types[a.type] = (types[a.type] || 0) + 1; });
+    const maxc = Math.max(1, ...Object.values(types));
+    document.getElementById("breakdown").innerHTML =
+      Object.entries(types)
+        .map(
+          ([t, c]) => `
+      <div style="margin-bottom:14px">
+        <div class="flex justify-between" style="font-size:0.85rem;margin-bottom:6px"><span>${t}</span><span class="muted">${c}</span></div>
+        <div class="progress-track"><div class="progress-fill" style="width:${(c / maxc) * 100}%"></div></div>
+      </div>`
+        )
+        .join("") || '<p class="muted">No threats in window.</p>';
+
+    // live alert feed
+    function renderAlerts() {
+      document.getElementById("alert-list").innerHTML = data.alerts
+        .map(
+          (a) => `
+        <div class="alert-row">
+          <span class="dot dot-${a.sev}"></span>
+          <span class="url">${a.host}</span>
+          <span class="pill-tag">${a.type}</span>
+          <span class="time">${a.time}</span>
+        </div>`
+        )
+        .join("");
+    }
+    renderAlerts();
+
+    // simulate a new alert arriving
+    setInterval(() => {
+      const d = generateDashboard();
+      const fresh = d.alerts[0];
+      fresh.time = "just now";
+      data.alerts.unshift(fresh);
+      data.alerts.pop();
+      renderAlerts();
+    }, 4000);
+  </script>
+</body>
+</html>
