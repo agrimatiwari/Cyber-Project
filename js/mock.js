@@ -217,7 +217,8 @@ function generateDashboard() {
       time: `${rand(1, 59)}m ago`,
     };
   });
-  const flagged = SAMPLE_DOMAINS.slice(0, 6).map((d) => ({
+  
+  const flagged = SAMPLE_DOMAINS.map((d) => ({
     host: d, type: pick(THREAT_TYPES), risk: rand(70, 99),
   }));
   return {
