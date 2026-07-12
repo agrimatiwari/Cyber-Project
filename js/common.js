@@ -76,7 +76,7 @@ function renderRibbon(active) {
     <a class="rib-logo" href="index.html" title="Home">${icon("logo")}</a>
     ${links}
     <div class="rib-spacer"></div>
-    <a class="rib-item" href="index.html" title="Settings">${icon("settings")}<span class="label">Settings</span></a>
+    <a class="rib-item ${"settings" === active ? "active" : ""}" href="settings.html" title="Settings">${icon("settings")}<span class="label">Settings</span></a>
   `;
 }
 
