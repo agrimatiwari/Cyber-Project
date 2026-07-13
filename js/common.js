@@ -63,10 +63,6 @@ function renderRibbon(active) {
   const items = [
     { id: "dashboard", label: "Dashboard", href: "dashboard.html", icon: "dashboard" },
     { id: "scan", label: "New Scan", href: "scan.html", icon: "scan" },
-    { id: "threat", label: "Threat Intel", href: "dashboard.html#threat", icon: "threat" },
-    { id: "traffic", label: "Network Traffic", href: "dashboard.html#traffic", icon: "traffic" },
-    { id: "assets", label: "Assets", href: "dashboard.html#assets", icon: "assets" },
-    { id: "logs", label: "Logs", href: "dashboard.html#logs", icon: "logs" },
     { id: "report", label: "Reports", href: "report.html", icon: "report" },
   ];
   const links = items
@@ -80,7 +76,7 @@ function renderRibbon(active) {
     <a class="rib-logo" href="index.html" title="Home">${icon("logo")}</a>
     ${links}
     <div class="rib-spacer"></div>
-    <a class="rib-item" href="index.html" title="Settings">${icon("settings")}<span class="label">Settings</span></a>
+    <a class="rib-item ${"settings" === active ? "active" : ""}" href="settings.html" title="Settings">${icon("settings")}<span class="label">Settings</span></a>
   `;
 }
 
