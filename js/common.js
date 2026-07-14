@@ -56,12 +56,9 @@ function toggleRibMenu(e) {
     z-index:200; overflow:hidden; font-family:var(--font-body);
   `;
   dd.innerHTML = `
-    <button onclick="toggleRibbon(); toggleRibMenu();" style="display:block;width:100%;text-align:left;padding:12px 16px;background:transparent;border:none;border-bottom:1px solid var(--border);color:var(--text);font-size:0.9rem;cursor:pointer">
+    <button onclick="toggleRibbon(); toggleRibMenu();" style="display:block;width:100%;text-align:left;padding:12px 16px;background:transparent;border:none;color:var(--text);font-size:0.9rem;cursor:pointer">
       ${pinned ? "Unpin sidebar" : "Pin sidebar open"}
     </button>
-    <a href="auth.html" style="display:block;width:100%;text-align:left;padding:12px 16px;color:var(--text);font-size:0.9rem;text-decoration:none">
-      Login / Account
-    </a>
   `;
   document.body.appendChild(dd);
 
@@ -113,6 +110,7 @@ function hydrateIcons() {
 /* ---- Ribbon markup (shared by app pages) ---- */
 function renderRibbon(active) {
   const items = [
+    { id: "home", label: "Homepage", href: "index.html", icon: "globe" },
     { id: "dashboard", label: "Dashboard", href: "dashboard.html", icon: "dashboard" },
     { id: "scan", label: "New Scan", href: "scan.html", icon: "scan" },
     { id: "report", label: "Reports", href: "report.html", icon: "report" },
