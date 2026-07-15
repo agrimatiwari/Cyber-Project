@@ -450,12 +450,18 @@
           <!-- Section: Page Size -->
           <div id="export-size-group">
             <div class="export-section-label">Page Size</div>
-            <select class="export-size-select" id="export-size">
-              <option value="a4" selected>A4 — 210 × 297 mm</option>
-              <option value="letter">Letter — 8.5 × 11 in</option>
-              <option value="a3">A3 — 297 × 420 mm</option>
-              <option value="fit">Fit to Content (single page)</option>
-            </select>
+            <div class="custom-select-wrapper" id="custom-size-select-wrapper">
+              <div class="export-size-select custom-select-trigger" id="custom-size-trigger">
+                <span id="custom-size-label">A4 — 210 × 297 mm</span>
+              </div>
+              <div class="custom-select-options">
+                <div class="custom-option selected" data-value="a4">A4 — 210 × 297 mm</div>
+                <div class="custom-option" data-value="letter">Letter — 8.5 × 11 in</div>
+                <div class="custom-option" data-value="a3">A3 — 297 × 420 mm</div>
+                <div class="custom-option" data-value="fit">Fit to Content (single page)</div>
+              </div>
+            </div>
+            <input type="hidden" id="export-size" value="a4" />
           </div>
 
           <div class="export-divider"></div>
@@ -721,6 +727,43 @@
         hydrateIcons();
       }
     }
+
+    // Custom Dropdown Logic
+    document.addEventListener("DOMContentLoaded", () => {
+      const wrapper = document.getElementById("custom-size-select-wrapper");
+      const trigger = document.getElementById("custom-size-trigger");
+      const label = document.getElementById("custom-size-label");
+      const hiddenInput = document.getElementById("export-size");
+      const options = document.querySelectorAll(".custom-option");
+
+      if (trigger) {
+        trigger.addEventListener("click", (e) => {
+          wrapper.classList.toggle("open");
+          e.stopPropagation();
+        });
+      }
+
+      options.forEach(opt => {
+        opt.addEventListener("click", (e) => {
+          // Update selected style
+          options.forEach(o => o.classList.remove("selected"));
+          opt.classList.add("selected");
+          
+          // Update label and hidden input
+          label.textContent = opt.textContent;
+          hiddenInput.value = opt.getAttribute("data-value");
+          
+          // Close dropdown
+          wrapper.classList.remove("open");
+          e.stopPropagation();
+        });
+      });
+
+      // Close dropdown when clicking outside
+      document.addEventListener("click", () => {
+        if (wrapper) wrapper.classList.remove("open");
+      });
+    });
   </script>
 </body>
 

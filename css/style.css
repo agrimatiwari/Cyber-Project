@@ -1970,8 +1970,7 @@ html:not([data-theme="light"]) .export-modal {
   border: 1px solid rgba(110, 135, 200, 0.4);
   box-shadow:
     inset 0 1px rgba(255, 255, 255, 0.06),
-    var(--shadow-lg),
-    0 0 80px rgba(114, 99, 255, 0.12);
+    var(--shadow-lg);
 }
 
 /* Light theme: white card with subtle inner glow */
@@ -2075,7 +2074,7 @@ html[data-theme="light"] .export-header {
   background: var(--accent-soft);
   color: var(--accent);
   border-color: var(--accent);
-  box-shadow: 0 0 12px rgba(114, 99, 255, 0.25);
+  box-shadow: var(--shadow-sm);
 }
 
 /* ---- Two-column layout ---- */
@@ -2169,9 +2168,7 @@ html:not([data-theme="light"]) .export-checkbox:hover {
     linear-gradient(180deg,
       rgba(114, 99, 255, 0.08) 0%,
       rgba(16, 26, 46, 0.6) 100%);
-  box-shadow:
-    inset 0 1px rgba(255, 255, 255, 0.04),
-    0 0 18px rgba(114, 99, 255, 0.1);
+  box-shadow: var(--shadow-md);
 }
 
 /* Light theme checkbox card styling */
@@ -2192,16 +2189,14 @@ html:not([data-theme="light"]) .export-checkbox:has(input:checked) {
     linear-gradient(180deg,
       rgba(114, 99, 255, 0.12) 0%,
       rgba(16, 26, 46, 0.7) 100%);
-  box-shadow:
-    inset 0 1px rgba(255, 255, 255, 0.05),
-    0 0 16px rgba(114, 99, 255, 0.12);
+  box-shadow: var(--shadow-md);
 }
 
 /* Selected card highlight (light theme) */
 html[data-theme="light"] .export-checkbox:has(input:checked) {
   border-color: var(--accent);
   background: rgba(91, 75, 219, 0.1);
-  box-shadow: 0 0 12px rgba(91, 75, 219, 0.12);
+  box-shadow: var(--shadow-md);
 }
 
 html[data-theme="light"] .export-checkbox:has(input:checked) span {
@@ -2232,13 +2227,13 @@ html[data-theme="light"] .export-checkbox input[type="checkbox"] {
 .export-checkbox input[type="checkbox"]:checked {
   background: var(--accent);
   border-color: var(--accent);
-  box-shadow: 0 0 10px rgba(114, 99, 255, 0.4);
+  box-shadow: none;
 }
 
 html[data-theme="light"] .export-checkbox input[type="checkbox"]:checked {
   background: var(--accent);
   border-color: var(--accent);
-  box-shadow: 0 0 8px rgba(91, 75, 219, 0.35);
+  box-shadow: none;
 }
 
 /* Solid inner dot */
@@ -2314,7 +2309,7 @@ html[data-theme="light"] .export-format-toggle {
 .export-format-toggle label.active {
   background: linear-gradient(135deg, var(--accent), #5b4bdb);
   color: #fff;
-  box-shadow: 0 4px 18px rgba(114, 99, 255, 0.4), 0 0 24px rgba(114, 99, 255, 0.15);
+  box-shadow: var(--shadow-md);
   border-color: rgba(114, 99, 255, 0.6);
 }
 
@@ -2345,19 +2340,20 @@ html[data-theme="light"] .export-format-toggle {
 html:not([data-theme="light"]) .export-size-select {
   background-color: rgba(12, 21, 38, 0.8);
   border: 1px solid rgba(110, 135, 200, 0.25);
-  box-shadow: inset 0 1px rgba(255, 255, 255, 0.03);
+  box-shadow: inset 0 1px rgba(255, 255, 255, 0.03), var(--shadow-sm);
 }
 
 html:not([data-theme="light"]) .export-size-select:hover,
 html:not([data-theme="light"]) .export-size-select:focus {
   border-color: rgba(114, 99, 255, 0.5);
-  box-shadow: 0 0 12px rgba(114, 99, 255, 0.15);
+  box-shadow: var(--shadow-md);
   outline: none;
 }
 
 html[data-theme="light"] .export-size-select {
   background-color: var(--panel-2);
   border: 1px solid var(--border);
+  box-shadow: var(--shadow-sm);
 }
 
 html[data-theme="light"] .export-size-select:hover,
@@ -2366,9 +2362,58 @@ html[data-theme="light"] .export-size-select:focus {
   outline: none;
 }
 
-.export-size-select option {
-  background: var(--panel);
+/* Custom Dropdown Styling */
+.custom-select-wrapper {
+  position: relative;
+  user-select: none;
+}
+
+.custom-select-options {
+  position: absolute;
+  top: calc(100% + 8px);
+  left: 0;
+  right: 0;
+  background: var(--panel-2);
+  border: 1px solid var(--border);
+  border-radius: 12px;
+  padding: 6px;
+  box-shadow: 0 10px 30px rgba(0, 0, 0, 0.4), 0 4px 12px rgba(0, 0, 0, 0.2);
+  z-index: 100;
+  opacity: 0;
+  visibility: hidden;
+  transform: translateY(-10px);
+  transition: opacity 0.2s, transform 0.2s, visibility 0.2s;
+}
+
+.custom-select-wrapper.open .custom-select-options {
+  opacity: 1;
+  visibility: visible;
+  transform: translateY(0);
+}
+
+.custom-option {
+  padding: 8px 12px;
+  margin-bottom: 2px;
+  font-size: 0.85rem;
   color: var(--text);
+  cursor: pointer;
+  border-radius: 6px;
+  transition: background 0.1s, color 0.1s;
+}
+
+.custom-option:last-child {
+  margin-bottom: 0;
+}
+
+.custom-option:hover {
+  background: var(--accent);
+  color: #ffffff;
+}
+
+.custom-option.selected {
+  background: var(--accent);
+  color: #ffffff;
+  font-weight: 500;
 }
 
 /* ----- Download button ----- */
@@ -2392,7 +2437,7 @@ html[data-theme="light"] .export-size-select:focus {
   position: relative;
   overflow: hidden;
   transition: transform 0.2s, box-shadow 0.3s;
-  box-shadow: 0 4px 20px rgba(114, 99, 255, 0.3);
+  box-shadow: var(--shadow-sm);
 }
 
 .export-download-btn::before {
@@ -2407,7 +2452,7 @@ html[data-theme="light"] .export-size-select:focus {
 
 .export-download-btn:hover {
   transform: translateY(-2px);
-  box-shadow: 0 8px 32px rgba(114, 99, 255, 0.5), 0 0 40px rgba(114, 99, 255, 0.2);
+  box-shadow: var(--shadow-md);
 }
 
 .export-download-btn:active {
@@ -2598,6 +2643,12 @@ html[data-theme="light"] .export-preview-viewport {
   background-color: var(--panel-2);
   transition: .4s;
   border: 1px solid var(--border);
+  box-shadow: var(--shadow-sm);
+}
+
+.theme-toggle:hover .slider {
+  box-shadow: var(--shadow-md);
+  border-color: var(--accent);
 }
 
 .theme-toggle .slider:before {
@@ -2611,11 +2662,11 @@ html[data-theme="light"] .export-preview-viewport {
   transition: .4s;
 }
 
-.theme-toggle input:checked + .slider {
+.theme-toggle input:checked+.slider {
   background-color: var(--panel-2);
 }
 
-.theme-toggle input:checked + .slider:before {
+.theme-toggle input:checked+.slider:before {
   transform: translateX(24px);
   background-color: var(--text);
 }
@@ -2626,4 +2677,4 @@ html[data-theme="light"] .export-preview-viewport {
 
 .theme-toggle .slider.round:before {
   border-radius: 50%;
-}
+}
